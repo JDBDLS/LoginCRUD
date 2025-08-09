@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema de Tareas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .login-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-container.hidden {
+            display: none;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header h1 {
+            color: #333;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #333;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .login-btn:hover {
+            background: #0056b3;
+        }
+
+        .error-message {
+            color: #dc3545;
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .dashboard {
+            display: none;
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f1f3f4;
+        }
+
+        .dashboard-header h1 {
+            color: #333;
+        }
+
+        .logout-btn {
+            padding: 0.5rem 1rem;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        .task-form {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .task-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 5px;
+            font-size: 1rem;
+            min-width: 200px;
+        }
+
+        .task-input:focus {
+            outline: none;
+            border-color: #333;
+        }
+
+        .add-btn, .update-btn, .cancel-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .add-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .add-btn:hover {
+            background: #218838;
+        }
+
+        .update-btn {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .update-btn:hover {
+            background: #e0a800;
+        }
+
+        .cancel-btn {
+            background: #999;
+            color: white;
+        }
+
+        .cancel-btn:hover {
+            background: #aaa;
+        }
+
+        .tasks-container {
+            min-height: 200px;
+        }
+
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #333;
+        }
+
+        .task-text {
+            flex: 1;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .edit-btn, .delete-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .edit-btn {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background: #138496;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+        .no-tasks {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 2rem;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .task-form {
+                flex-direction: column;
+            }
+            
+            .task-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .task-actions {
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container" id="loginContainer">
+        <div class="login-header">
+            <h1>Iniciar Sesión</h1>
+            <p>Accede a tu sistema de tareas</p>
+        </div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Usuario:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="login-btn">Iniciar Sesión</button>
+            <div id="errorMessage" class="error-message"></div>
+        </form>
+    </div>
+
+    <div class="dashboard" id="dashboard">
+        <div class="dashboard-header">
+            <h1>Mis Tareas</h1>
+            <button class="logout-btn" id="logoutBtn">Cerrar Sesión</button>
+        </div>
+        
+        <div class="task-form">
+            <input type="text" id="taskInput" class="task-input" placeholder="Escribe una nueva tarea...">
+            <button id="addTaskBtn" class="add-btn">Agregar</button>
+            <button id="updateTaskBtn" class="update-btn" style="display: none;">Actualizar</button>
+            <button id="cancelEditBtn" class="cancel-btn" style="display: none;">Cancelar</button>
+        </div>
+
+        <div class="tasks-container" id="tasksContainer">
+            <div class="no-tasks" id="noTasks">No hay tareas pendientes</div>
+        </div>
+    </div>
+
+    <script>
+        class TaskManager {
+            constructor() {
+                this.tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+                this.editingTaskId = null;
+                this.initializeEventListeners();
+                this.renderTasks();
+            }
+
+            initializeEventListeners() {
+                document.getElementById('loginForm').addEventListener('submit', this.handleLogin.bind(this));
+                document.getElementById('logoutBtn').addEventListener('click', this.handleLogout.bind(this));
+                document.getElementById('addTaskBtn').addEventListener('click', this.addTask.bind(this));
+                document.getElementById('updateTaskBtn').addEventListener('click', this.updateTask.bind(this));
+                document.getElementById('cancelEditBtn').addEventListener('click', this.cancelEdit.bind(this));
+                document.getElementById('taskInput').addEventListener('keypress', this.handleKeyPress.bind(this));
+            }
+
+            handleLogin(e) {
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                const errorMessage = document.getElementById('errorMessage');
+
+                if (username === 'usuario' && password === 'contraseña') {
+                    document.getElementById('loginContainer').classList.add('hidden');
+                    document.getElementById('dashboard').classList.add('active');
+                    document.body.style.alignItems = 'flex-start';
+                    errorMessage.textContent = '';
+                } else {
+                    errorMessage.textContent = 'Usuario o contraseña incorrectos';
+                }
+            }
+
+            handleLogout() {
+                document.getElementById('loginContainer').classList.remove('hidden');
+                document.getElementById('dashboard').classList.remove('active');
+                document.body.style.alignItems = 'center';
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+                this.cancelEdit();
+            }
+
+            handleKeyPress(e) {
+                if (e.key === 'Enter') {
+                    if (this.editingTaskId !== null) {
+                        this.updateTask();
+                    } else {
+                        this.addTask();
+                    }
+                }
+            }
+
+            addTask() {
+                const taskInput = document.getElementById('taskInput');
+                const taskText = taskInput.value.trim();
+
+                if (taskText === '') return;
+
+                const newTask = {
+                    id: Date.now(),
+                    text: taskText,
+                    createdAt: new Date().toLocaleString()
+                };
+
+                this.tasks.push(newTask);
+                this.saveTasks();
+                this.renderTasks();
+                taskInput.value = '';
+            }
+
+            editTask(taskId) {
+                const task = this.tasks.find(t => t.id === taskId);
+                if (task) {
+                    document.getElementById('taskInput').value = task.text;
+                    this.editingTaskId = taskId;
+                    
+                    document.getElementById('addTaskBtn').style.display = 'none';
+                    document.getElementById('updateTaskBtn').style.display = 'inline-block';
+                    document.getElementById('cancelEditBtn').style.display = 'inline-block';
+                    
+                    document.getElementById('taskInput').focus();
+                }
+            }
+
+            updateTask() {
+                const taskInput = document.getElementById('taskInput');
+                const taskText = taskInput.value.trim();
+
+                if (taskText === '' || this.editingTaskId === null) return;
+
+                const taskIndex = this.tasks.findIndex(t => t.id === this.editingTaskId);
+                if (taskIndex !== -1) {
+                    this.tasks[taskIndex].text = taskText;
+                    this.saveTasks();
+                    this.renderTasks();
+                    this.cancelEdit();
+                }
+            }
+
+            cancelEdit() {
+                this.editingTaskId = null;
+                document.getElementById('taskInput').value = '';
+                
+                document.getElementById('addTaskBtn').style.display = 'inline-block';
+                document.getElementById('updateTaskBtn').style.display = 'none';
+                document.getElementById('cancelEditBtn').style.display = 'none';
+            }
+
+            deleteTask(taskId) {
+                if (confirm('¿Estás seguro de que quieres eliminar esta tarea?')) {
+                    this.tasks = this.tasks.filter(t => t.id !== taskId);
+                    this.saveTasks();
+                    this.renderTasks();
+                    
+                    if (this.editingTaskId === taskId) {
+                        this.cancelEdit();
+                    }
+                }
+            }
+
+            renderTasks() {
+                const tasksContainer = document.getElementById('tasksContainer');
+
+                if (this.tasks.length === 0) {
+                    tasksContainer.innerHTML = '<div class="no-tasks">No hay tareas pendientes</div>';
+                    return;
+                }
+
+                const tasksHTML = this.tasks.map(task => `
+                    <div class="task-item">
+                        <div class="task-text">${task.text}</div>
+                        <div class="task-actions">
+                            <button class="edit-btn" onclick="taskManager.editTask(${task.id})">Editar</button>
+                            <button class="delete-btn" onclick="taskManager.deleteTask(${task.id})">Eliminar</button>
+                        </div>
+                    </div>
+                `).join('');
+
+                tasksContainer.innerHTML = tasksHTML;
+            }
+
+            saveTasks() {
+                localStorage.setItem('tasks', JSON.stringify(this.tasks));
+            }
+        }
+
+        const taskManager = new TaskManager();
+    </script>
+</body>
+</html>
